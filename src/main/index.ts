@@ -1,7 +1,10 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
+import ApiRequestIpcHandler from '@main/modules/Api/IpcHandlers/Request';
 
 app.whenReady().then(async () => {
+    ipcMain.handle('api:request', ApiRequestIpcHandler);
+
     const mainWindow = new BrowserWindow({
         width: 1280,
         height: 720,
