@@ -1,24 +1,29 @@
 {
-  "name": "lomi-client",
-  "version": "0.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MaxLehmann01/lomi-client.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/MaxLehmann01/lomi-client/issues"
-  },
-  "homepage": "https://github.com/MaxLehmann01/lomi-client#readme",
-  "devDependencies": {
-    "prettier": "^3.8.3"
-  }
+    "name": "lomi-client",
+    "version": "0.0.0",
+    "description": "",
+    "main": "./out/main/index.js",
+    "scripts": {
+        "dev": "electron-vite dev"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/MaxLehmann01/lomi-client.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs",
+    "bugs": {
+        "url": "https://github.com/MaxLehmann01/lomi-client/issues"
+    },
+    "homepage": "https://github.com/MaxLehmann01/lomi-client#readme",
+    "devDependencies": {
+        "@electron-toolkit/tsconfig": "^2.0.0",
+        "electron": "^42.0.1",
+        "electron-vite": "^5.0.0",
+        "prettier": "^3.8.3",
+        "typescript": "^6.0.3",
+        "vite": "^7.3.3"
+    }
 }
