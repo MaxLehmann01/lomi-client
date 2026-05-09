@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/MaxLehmann01/lomi-client/issues"
   },
-  "homepage": "https://github.com/MaxLehmann01/lomi-client#readme"
+  "homepage": "https://github.com/MaxLehmann01/lomi-client#readme",
+  "devDependencies": {
+    "prettier": "^3.8.3"
+  }
 }
