@@ -1,4 +1,4 @@
-import { IpcAxiosRequestConfig, IpcAxiosResult } from '@shared/types/Api';
+import { IpcAxiosRequestConfig, IpcAxiosResult } from '@shared/Types/Api';
 
 export async function apiRequest(
     requestConfig: IpcAxiosRequestConfig

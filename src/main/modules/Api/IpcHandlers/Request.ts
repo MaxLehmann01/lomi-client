@@ -1,5 +1,5 @@
 import { IpcMainInvokeEvent } from 'electron';
-import { IpcAxiosRequestConfig, IpcAxiosResult } from '@shared/types/Api';
+import { IpcAxiosRequestConfig, IpcAxiosResult } from '@shared/Types/Api';
 import axios from 'axios';
 
 export default async function ApiRequestIpcHandler(

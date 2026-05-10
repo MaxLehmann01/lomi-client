@@ -1,4 +1,5 @@
 import {
+    Device,
     DeviceIdentity,
     DeviceIdentityRecord,
     Keypair,
@@ -85,6 +86,14 @@ async function writeDeviceIdentity(identity: DeviceIdentity): Promise<void> {
     );
 }
 
+function getCachedDeviceIdentity(): DeviceIdentity {
+    if (!cachedDeviceIdentity) {
+        throw new Error('Device identity has not been initialized yet.');
+    }
+
+    return cachedDeviceIdentity;
+}
+
 export async function getOrCreateDeviceIdentity(): Promise<DeviceIdentity> {
     if (cachedDeviceIdentity) {
         return cachedDeviceIdentity;
@@ -123,4 +132,12 @@ export async function getOrCreateDeviceIdentity(): Promise<DeviceIdentity> {
 
         return cachedDeviceIdentity;
     }
+}
+
+export function getDevice(): Device {
+    return getCachedDeviceIdentity().device;
+}
+
+export function getPublicKey(): Keypair['publicKey'] {
+    return getCachedDeviceIdentity().keypair.publicKey;
 }

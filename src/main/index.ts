@@ -2,11 +2,22 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import ApiRequestIpcHandler from '@main/modules/Api/IpcHandlers/Request';
 import { getOrCreateDeviceIdentity } from '@main/modules/DeviceIdentity/DeviceIdentity';
+import DeviceIdentityGetDeviceIpcHandler from '@main/modules/DeviceIdentity/IpcHandlers/GetDevice';
+import DeviceIdentityGetPublicKeyIpcHandler from '@main/modules/DeviceIdentity/IpcHandlers/GetPublicKey';
 
 app.whenReady().then(async () => {
     await getOrCreateDeviceIdentity();
 
     ipcMain.handle('api:request', ApiRequestIpcHandler);
+
+    ipcMain.handle(
+        'deviceIdentity:getDevice',
+        DeviceIdentityGetDeviceIpcHandler
+    );
+    ipcMain.handle(
+        'deviceIdentity:getPublicKey',
+        DeviceIdentityGetPublicKeyIpcHandler
+    );
 
     const mainWindow = new BrowserWindow({
         width: 1280,

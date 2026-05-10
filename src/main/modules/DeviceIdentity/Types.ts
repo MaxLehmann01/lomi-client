@@ -1,12 +1,4 @@
-type Device = {
-    id: string;
-    name: string;
-};
-
-export type Keypair = {
-    privateKey: string;
-    publicKey: string;
-};
+import { Device, Keypair } from '@shared/Types/DeviceIdentity';
 
 export type DeviceIdentity = {
     device: Device;
