@@ -2,6 +2,8 @@ import { apiRequest } from '@renderer/src/services/Api';
 import { useEffect, useState } from 'react';
 import { IpcAxiosResult } from '@shared/Types/Api';
 import { Device, Keypair } from '@shared/Types/DeviceIdentity';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import Theme from '@renderer/src/theme/Theme';
 
 export default function App() {
     const [response, setResponse] = useState<IpcAxiosResult | null>(null);
@@ -26,16 +28,19 @@ export default function App() {
     }, []);
 
     return (
-        <div>
-            <h1 className={'text-4xl p-2 text-red-900'}>
-                Hello World from React + TailwindCSS!
-            </h1>
-            <br />
-            <span>Device: {JSON.stringify(device)}</span>
-            <br />
-            <span>PublicKey: {publicKey}</span>
-            <br />
-            <pre>{JSON.stringify(response, null, 2)}</pre>
-        </div>
+        <ThemeProvider theme={Theme}>
+            <CssBaseline />
+            <div>
+                <h1 className={'text-4xl p-2 text-red-900'}>
+                    Hello World from React + TailwindCSS!
+                </h1>
+                <br />
+                <span>Device: {JSON.stringify(device)}</span>
+                <br />
+                <span>PublicKey: {publicKey}</span>
+                <br />
+                <pre>{JSON.stringify(response, null, 2)}</pre>
+            </div>
+        </ThemeProvider>
     );
 }
