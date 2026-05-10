@@ -1,8 +1,11 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import ApiRequestIpcHandler from '@main/modules/Api/IpcHandlers/Request';
+import { getOrCreateDeviceIdentity } from '@main/modules/DeviceIdentity/DeviceIdentity';
 
 app.whenReady().then(async () => {
+    await getOrCreateDeviceIdentity();
+
     ipcMain.handle('api:request', ApiRequestIpcHandler);
 
     const mainWindow = new BrowserWindow({
