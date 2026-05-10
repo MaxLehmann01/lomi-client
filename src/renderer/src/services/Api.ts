@@ -1,7 +1,13 @@
 import { IpcAxiosRequestConfig, IpcAxiosResult } from '@shared/Types/Api';
 
-export async function apiRequest(
+type IpcAxiosResultWithData<T> = Omit<IpcAxiosResult, 'data'> & {
+    data: T;
+};
+
+export async function apiRequest<T = unknown>(
     requestConfig: IpcAxiosRequestConfig
-): Promise<IpcAxiosResult> {
-    return await window.api.request(requestConfig);
+): Promise<IpcAxiosResultWithData<T>> {
+    return (await window.api.request(
+        requestConfig
+    )) as IpcAxiosResultWithData<T>;
 }
