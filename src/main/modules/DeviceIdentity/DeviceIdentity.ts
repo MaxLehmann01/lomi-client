@@ -2,6 +2,7 @@ import {
     Device,
     DeviceIdentity,
     DeviceIdentityRecord,
+    EncryptedAccountKeyForDevice,
     Keypair,
 } from '@main/modules/DeviceIdentity/Types';
 import path from 'path';
@@ -140,4 +141,89 @@ export function getDevice(): Device {
 
 export function getPublicKey(): Keypair['publicKey'] {
     return getCachedDeviceIdentity().keypair.publicKey;
+}
+
+export function encryptAccountKeyWithPublicKey(
+    accountKey: Buffer,
+    publicKey: string
+): EncryptedAccountKeyForDevice {
+    if (!Buffer.isBuffer(accountKey)) {
+        throw new Error('Account key must be a Buffer.');
+    }
+
+    if (accountKey.length !== 32) {
+        throw new Error('Account key must be 32 bytes.');
+    }
+
+    const encryptedAccountKey = crypto.publicEncrypt(
+        {
+            key: publicKey,
+            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+            oaepHash: 'sha256',
+        },
+        accountKey
+    );
+
+    return {
+        version: 1,
+        algorithm: 'RSA-OAEP-SHA256',
+        encryptedAccountKey: encryptedAccountKey.toString('base64'),
+    };
+}
+
+export function decryptAccountKeyWithPrivateKey(
+    encryptedAccountKeyForDevice: EncryptedAccountKeyForDevice,
+    privateKey: string
+): Buffer {
+    if (
+        !encryptedAccountKeyForDevice ||
+        typeof encryptedAccountKeyForDevice !== 'object'
+    ) {
+        throw new Error('Encrypted account key is required.');
+    }
+
+    if (encryptedAccountKeyForDevice.version !== 1) {
+        throw new Error('Unsupported encrypted account key version.');
+    }
+
+    if (encryptedAccountKeyForDevice.algorithm !== 'RSA-OAEP-SHA256') {
+        throw new Error('Unsupported encrypted account key algorithm.');
+    }
+
+    const accountKey = crypto.privateDecrypt(
+        {
+            key: privateKey,
+            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+            oaepHash: 'sha256',
+        },
+        Buffer.from(encryptedAccountKeyForDevice.encryptedAccountKey, 'base64')
+    );
+
+    if (accountKey.length !== 32) {
+        throw new Error('Invalid account key length.');
+    }
+
+    return accountKey;
+}
+
+export function encryptAccountKeyForCurrentDevice(
+    accountKey: Buffer
+): EncryptedAccountKeyForDevice {
+    const identity = getCachedDeviceIdentity();
+
+    return encryptAccountKeyWithPublicKey(
+        accountKey,
+        identity.keypair.publicKey
+    );
+}
+
+export function decryptAccountKeyForCurrentDevice(
+    encryptedAccountKeyForDevice: EncryptedAccountKeyForDevice
+): Buffer {
+    const identity = getCachedDeviceIdentity();
+
+    return decryptAccountKeyWithPrivateKey(
+        encryptedAccountKeyForDevice,
+        identity.keypair.privateKey
+    );
 }

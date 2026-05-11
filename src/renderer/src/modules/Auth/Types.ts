@@ -40,3 +40,19 @@ export type AuthTokens = {
         expiresIn: number;
     };
 };
+
+export type AuthEncryptedAccountKey = {
+    version: 1;
+    algorithm: 'AES-256-GCM';
+    kdf: {
+        algorithm: 'scrypt';
+        salt: string;
+        N: number;
+        r: number;
+        p: number;
+        keyLength: number;
+    };
+    iv: string;
+    authTag: string;
+    encryptedKey: string;
+};

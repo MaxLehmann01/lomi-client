@@ -15,6 +15,7 @@ import {
 } from '@renderer/src/modules/Auth/AuthStore';
 import {
     AuthDevice,
+    AuthEncryptedAccountKey,
     AuthState,
     AuthTokens,
     AuthUser,
@@ -217,7 +218,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 const device = await window.deviceIdentity.getDevice();
                 const publicKey = await window.deviceIdentity.getPublicKey();
 
-                const signInResponse = await apiRequest<{ data: AuthTokens }>({
+                const signInResponse = await apiRequest<{
+                    data: AuthTokens & {
+                        encryptedAccountKey: AuthEncryptedAccountKey;
+                    };
+                }>({
                     method: 'POST',
                     url: `${serverUrl}/auth/sign-in`,
                     data: {
@@ -249,6 +254,22 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                     serverUrl,
                     newTokens.accessToken.token,
                     newTokens.refreshToken.token
+                );
+
+                const accountKeyBase64 =
+                    await window.accountEncryption.decryptAccountKeyWithPassword(
+                        password,
+                        signInResponse.data.data.encryptedAccountKey
+                    );
+
+                const encryptedAccountKeyForDevice =
+                    await window.deviceIdentity.encryptAccountKey(
+                        accountKeyBase64
+                    );
+
+                await window.accountEncryption.saveLocalEncryptedAccountKey(
+                    authUser.id,
+                    encryptedAccountKeyForDevice
                 );
 
                 const authDevices = await fetchDevices(

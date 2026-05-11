@@ -4,6 +4,12 @@ import ApiRequestIpcHandler from '@main/modules/Api/IpcHandlers/Request';
 import { getOrCreateDeviceIdentity } from '@main/modules/DeviceIdentity/DeviceIdentity';
 import DeviceIdentityGetDeviceIpcHandler from '@main/modules/DeviceIdentity/IpcHandlers/GetDevice';
 import DeviceIdentityGetPublicKeyIpcHandler from '@main/modules/DeviceIdentity/IpcHandlers/GetPublicKey';
+import AccountEncryptionDecryptAccountKeyWithPasswordIpcHandler from '@main/modules/AccountEncryption/IpcHandlers/DecryptAccountKeyWithPassword';
+import DeviceIdentityEncryptAccountKeyIpcHandler from '@main/modules/DeviceIdentity/IpcHandlers/EncryptAccountKey';
+import DeviceIdentityDecryptAccountKeyIpcHandler from '@main/modules/DeviceIdentity/IpcHandlers/DecryptAccountKey';
+import AccountEncryptionSaveLocalEncryptedAccountKeyIpcHandler from '@main/modules/AccountEncryption/IpcHandlers/SaveLocalEncryptedAccountKey';
+import AccountEncryptionLoadLocalEncryptedAccountKeyIpcHandler from '@main/modules/AccountEncryption/IpcHandlers/LoadLocalEncryptedAccountKey';
+import AccountEncryptionClearLocalEncryptedAccountKeyIpcHandler from '@main/modules/AccountEncryption/IpcHandlers/ClearLocalEncryptedAccountKey';
 
 app.whenReady().then(async () => {
     await getOrCreateDeviceIdentity();
@@ -17,6 +23,33 @@ app.whenReady().then(async () => {
     ipcMain.handle(
         'deviceIdentity:getPublicKey',
         DeviceIdentityGetPublicKeyIpcHandler
+    );
+    ipcMain.handle(
+        'deviceIdentity:encryptAccountKey',
+        DeviceIdentityEncryptAccountKeyIpcHandler
+    );
+    ipcMain.handle(
+        'deviceIdentity:decryptAccountKey',
+        DeviceIdentityDecryptAccountKeyIpcHandler
+    );
+
+    ipcMain.handle(
+        'accountEncryption:decryptAccountKeyWithPassword',
+        AccountEncryptionDecryptAccountKeyWithPasswordIpcHandler
+    );
+    ipcMain.handle(
+        'accountEncryption:saveLocalEncryptedAccountKey',
+        AccountEncryptionSaveLocalEncryptedAccountKeyIpcHandler
+    );
+
+    ipcMain.handle(
+        'accountEncryption:loadLocalEncryptedAccountKey',
+        AccountEncryptionLoadLocalEncryptedAccountKeyIpcHandler
+    );
+
+    ipcMain.handle(
+        'accountEncryption:clearLocalEncryptedAccountKey',
+        AccountEncryptionClearLocalEncryptedAccountKeyIpcHandler
     );
 
     const mainWindow = new BrowserWindow({
