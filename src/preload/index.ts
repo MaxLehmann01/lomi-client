@@ -1,7 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { IpcAxiosRequestConfig, IpcAxiosResult } from '@shared/Types/Api';
-import { Device, Keypair } from '@shared/Types/DeviceIdentity';
-import { EncryptedAccountKeyForDevice } from '@main/modules/DeviceIdentity/Types';
+import {
+    Device,
+    EncryptedAccountKeyForDevice,
+    Keypair,
+} from '@shared/Types/DeviceIdentity';
+import { EncryptedPayload } from '@shared/Types/AccountEncryption';
 
 contextBridge.exposeInMainWorld('electron', {
     process: {
@@ -68,10 +72,26 @@ contextBridge.exposeInMainWorld('accountEncryption', {
             'accountEncryption:loadLocalEncryptedAccountKey'
         );
     },
-
     clearLocalEncryptedAccountKey: () => {
         return ipcRenderer.invoke(
             'accountEncryption:clearLocalEncryptedAccountKey'
+        );
+    },
+    encryptPayload: (payload: unknown, accountKeyBase64: string) => {
+        return ipcRenderer.invoke(
+            'accountEncryption:encryptPayload',
+            payload,
+            accountKeyBase64
+        );
+    },
+    decryptPayload: (
+        encryptedPayload: EncryptedPayload,
+        accountKeyBase64: string
+    ) => {
+        return ipcRenderer.invoke(
+            'accountEncryption:decryptPayload',
+            encryptedPayload,
+            accountKeyBase64
         );
     },
 });

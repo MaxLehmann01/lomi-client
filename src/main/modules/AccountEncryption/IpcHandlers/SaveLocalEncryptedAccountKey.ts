@@ -1,6 +1,6 @@
 import { IpcMainInvokeEvent } from 'electron';
 import { saveLocalEncryptedAccountKey } from '@main/modules/AccountEncryption/LocalAccountKey';
-import { EncryptedAccountKeyForDevice } from '@main/modules/DeviceIdentity/Types';
+import { EncryptedAccountKeyForDevice } from '@shared/Types/DeviceIdentity';
 
 export default async function AccountEncryptionSaveLocalEncryptedAccountKeyIpcHandler(
     _: IpcMainInvokeEvent,

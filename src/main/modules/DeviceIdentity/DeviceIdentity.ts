@@ -1,15 +1,17 @@
 import {
-    Device,
     DeviceIdentity,
     DeviceIdentityRecord,
-    EncryptedAccountKeyForDevice,
-    Keypair,
 } from '@main/modules/DeviceIdentity/Types';
 import path from 'path';
 import { app, safeStorage } from 'electron';
 import crypto from 'crypto';
 import { promises as fs } from 'node:fs';
 import os from 'node:os';
+import {
+    Device,
+    EncryptedAccountKeyForDevice,
+    Keypair,
+} from '@shared/Types/DeviceIdentity';
 
 const FILE_NAME = 'device_identity.json';
 

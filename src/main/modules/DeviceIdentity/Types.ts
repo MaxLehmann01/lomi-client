@@ -13,9 +13,3 @@ export type DeviceIdentityRecord = {
     };
     createdAt: string;
 };
-
-export type EncryptedAccountKeyForDevice = {
-    version: 1;
-    algorithm: 'RSA-OAEP-SHA256';
-    encryptedAccountKey: string;
-};

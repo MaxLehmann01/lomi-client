@@ -10,6 +10,8 @@ import DeviceIdentityDecryptAccountKeyIpcHandler from '@main/modules/DeviceIdent
 import AccountEncryptionSaveLocalEncryptedAccountKeyIpcHandler from '@main/modules/AccountEncryption/IpcHandlers/SaveLocalEncryptedAccountKey';
 import AccountEncryptionLoadLocalEncryptedAccountKeyIpcHandler from '@main/modules/AccountEncryption/IpcHandlers/LoadLocalEncryptedAccountKey';
 import AccountEncryptionClearLocalEncryptedAccountKeyIpcHandler from '@main/modules/AccountEncryption/IpcHandlers/ClearLocalEncryptedAccountKey';
+import AccountEncryptionEncryptPayloadIpcHandler from '@main/modules/AccountEncryption/IpcHandlers/EncryptPayload';
+import AccountEncryptionDecryptPayloadIpcHandler from '@main/modules/AccountEncryption/IpcHandlers/DecryptPayload';
 
 app.whenReady().then(async () => {
     await getOrCreateDeviceIdentity();
@@ -50,6 +52,15 @@ app.whenReady().then(async () => {
     ipcMain.handle(
         'accountEncryption:clearLocalEncryptedAccountKey',
         AccountEncryptionClearLocalEncryptedAccountKeyIpcHandler
+    );
+    ipcMain.handle(
+        'accountEncryption:encryptPayload',
+        AccountEncryptionEncryptPayloadIpcHandler
+    );
+
+    ipcMain.handle(
+        'accountEncryption:decryptPayload',
+        AccountEncryptionDecryptPayloadIpcHandler
     );
 
     const mainWindow = new BrowserWindow({

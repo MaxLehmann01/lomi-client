@@ -1,20 +1,5 @@
 import crypto from 'crypto';
-
-export type EncryptedAccountKey = {
-    version: 1;
-    algorithm: 'AES-256-GCM';
-    kdf: {
-        algorithm: 'scrypt';
-        salt: string;
-        N: number;
-        r: number;
-        p: number;
-        keyLength: number;
-    };
-    iv: string;
-    authTag: string;
-    encryptedKey: string;
-};
+import { EncryptedAccountKey } from '@shared/Types/AccountEncryption';
 
 function deriveAccountKeyEncryptionKey(
     password: string,

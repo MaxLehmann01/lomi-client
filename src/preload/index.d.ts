@@ -1,8 +1,6 @@
-import { IpcAxiosRequestConfig, IpcAxiosResponse, IpcAxiosResult } from "../shared/types/Api";
-import { Device, EncryptedAccountKeyForDevice } from "../main/modules/DeviceIdentity/Types";
-import { Keypair } from "../shared/types/DeviceIdentity";
-import { EncryptedAccountKey } from "../main/modules/AccountEncryption/AccountEncryption";
-import { LocalEncryptedAccountKeyRecord } from "../main/modules/AccountEncryption/LocalAccountKey";
+import { IpcAxiosRequestConfig, IpcAxiosResponse, IpcAxiosResult } from "@shared/Types/Api";
+import { Keypair, Device, EncryptedAccountKeyForDevice } from "@shared/Types/DeviceIdentity";
+import { EncryptedAccountKey, LocalEncryptedAccountKeyRecord, EncryptedPayload } from "@shared/Types/AccountEncryption";
 
 declare global {
   interface Window {
@@ -28,6 +26,15 @@ declare global {
       ) => Promise<void>,
       loadLocalEncryptedAccountKey: (userId: string) => Promise<LocalEncryptedAccountKeyRecord | null>,
       clearLocalEncryptedAccountKey: (userId: string) => Promise<void>,
+      encryptPayload: (
+          payload: unknown,
+          accountKeyBase64: string
+      ) => Promise<EncryptedPayload>;
+
+      decryptPayload: <T = unknown>(
+          encryptedPayload: EncryptedPayload,
+          accountKeyBase64: string
+      ) => Promise<T>;
     }
   }
 }

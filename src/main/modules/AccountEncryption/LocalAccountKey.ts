@@ -1,17 +1,10 @@
 import { app } from 'electron';
 import path from 'path';
 import { promises as fs } from 'node:fs';
-import { EncryptedAccountKeyForDevice } from '@main/modules/DeviceIdentity/Types';
+import { EncryptedAccountKeyForDevice } from '@shared/Types/DeviceIdentity';
+import { LocalEncryptedAccountKeyRecord } from '@shared/Types/AccountEncryption';
 
 const FILE_NAME = 'local_account_key.json';
-
-export type LocalEncryptedAccountKeyRecord = {
-    version: 1;
-    userId: string;
-    encryptedAccountKeyForDevice: EncryptedAccountKeyForDevice;
-    createdAt: string;
-    updatedAt: string;
-};
 
 function getFilePath(): string {
     return path.join(app.getPath('userData'), FILE_NAME);
