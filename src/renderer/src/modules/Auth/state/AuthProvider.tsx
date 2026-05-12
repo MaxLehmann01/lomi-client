@@ -387,8 +387,20 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             signIn,
             signOut,
             removeDevice,
+            serverUrl,
+            tokens,
         }),
-        [isLoading, user, devices, thisDevice, signIn, signOut, removeDevice]
+        [
+            isLoading,
+            user,
+            devices,
+            thisDevice,
+            signIn,
+            signOut,
+            removeDevice,
+            serverUrl,
+            tokens,
+        ]
     );
 
     return <AuthContext.Provider value={contextValue} children={children} />;

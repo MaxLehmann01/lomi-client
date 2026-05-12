@@ -1,6 +1,10 @@
-import { createContext } from 'react';
-import { AuthDevice, AuthUser } from '@renderer/src/modules/Auth/Types';
+import {
+    AuthDevice,
+    AuthState,
+    AuthUser,
+} from '@renderer/src/modules/Auth/Types';
 import { Device } from '@shared/Types/DeviceIdentity';
+import { createContext } from 'react';
 
 type AuthContext = {
     isLoading: boolean;
@@ -14,6 +18,8 @@ type AuthContext = {
     ) => Promise<boolean>;
     signOut: () => Promise<void>;
     removeDevice: (deviceId: AuthDevice['id']) => Promise<void>;
+    serverUrl: string | null;
+    tokens: AuthState['tokens'] | null;
 };
 
 export default createContext<AuthContext | undefined>(undefined);

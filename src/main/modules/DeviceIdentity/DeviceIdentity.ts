@@ -106,10 +106,10 @@ export async function getOrCreateDeviceIdentity(): Promise<DeviceIdentity> {
 
     try {
         const fileContent = await fs.readFile(filePath, 'utf-8');
-        const storedIdentity = JSON.parse(fileContent) as DeviceIdentity;
+        const storedIdentity = JSON.parse(fileContent) as DeviceIdentityRecord;
 
         const decryptedPrivateKey = await decryptPrivateKey(
-            storedIdentity.keypair.privateKey
+            storedIdentity.keypair.encryptedPrivateKey
         );
 
         cachedDeviceIdentity = {
@@ -121,7 +121,8 @@ export async function getOrCreateDeviceIdentity(): Promise<DeviceIdentity> {
         };
 
         return cachedDeviceIdentity;
-    } catch {
+    } catch (e) {
+        console.log(e);
         const newDeviceIdentity = {
             device: {
                 id: crypto.randomUUID(),

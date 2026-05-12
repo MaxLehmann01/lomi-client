@@ -1,69 +1,108 @@
+// src/renderer/src/modules/Layout/Layout.tsx
 import { Button, Divider, TextField } from '@mui/material';
 import AuthButton from '@renderer/src/modules/Auth/components/AuthButton';
 import useAuth from '@renderer/src/modules/Auth/state/useAuth';
+import { apiRequest } from '@renderer/src/services/Api';
 import { useEffect, useState } from 'react';
 import { EncryptedPayload } from '@shared/Types/AccountEncryption';
 
 export default function Layout() {
-    const { user } = useAuth();
+    const { serverUrl, tokens, user } = useAuth();
 
     const [encryptedAccountKey, setEncryptedAccountKey] = useState<any>(null);
     const [decryptedAccountKey, setDecryptedAccountKey] = useState<any>(null);
 
     const [payload, setPayload] = useState<string>('');
-    const [encryptedPayload, setEncryptedPayload] =
-        useState<EncryptedPayload | null>(null);
 
-    const handleEncryptPayload = async () => {
+    const handleSaveRequest = async () => {
+        if (!serverUrl || !tokens || !user || !decryptedAccountKey) return;
+
         try {
-            setEncryptedPayload(
-                await window.accountEncryption.encryptPayload(
-                    payload,
-                    decryptedAccountKey
-                )
+            const encrypted = await window.accountEncryption.encryptPayload(
+                payload,
+                decryptedAccountKey
             );
+
+            await apiRequest({
+                method: 'POST',
+                url: `${serverUrl}/requests`,
+                data: encrypted,
+                headers: {
+                    'x-auth-access-token': tokens.accessToken.token,
+                    'x-auth-refresh-token': tokens.refreshToken.token,
+                },
+            });
         } catch (e) {
             console.error(e);
         }
     };
 
+    const fetchAndDecryptRequests = async (accountKey: string) => {
+        if (!serverUrl || !tokens || !user) return;
+
+        const response = await apiRequest<{ data: any[] }>({
+            method: 'GET',
+            url: `${serverUrl}/requests`,
+            headers: {
+                'x-auth-access-token': tokens.accessToken.token,
+                'x-auth-refresh-token': tokens.refreshToken.token,
+            },
+        });
+
+        const decrypted = await Promise.all(
+            (response.data.data ?? []).map(async (req) => {
+                const encryptedConfig = req?.encryptedConfig as
+                    | EncryptedPayload
+                    | undefined;
+
+                if (!encryptedConfig) return null;
+
+                try {
+                    return await window.accountEncryption.decryptPayload(
+                        encryptedConfig,
+                        accountKey
+                    );
+                } catch (err) {
+                    console.error(`decrypt failed`, {
+                        err,
+                        encryptedConfig,
+                        accountKeyType: typeof accountKey,
+                        accountKeyIsNull: accountKey == null,
+                    });
+                    return null;
+                }
+            })
+        );
+
+        console.log(decrypted.filter((x) => x != null));
+    };
+
     useEffect(() => {
-        if (user) {
-            (async () => {
+        if (!user) return;
+
+        (async () => {
+            try {
                 const eak =
                     await window.accountEncryption.loadLocalEncryptedAccountKey(
                         user.id
                     );
 
                 setEncryptedAccountKey(eak);
+                if (!eak) return;
 
-                if (eak) {
-                    const dak = await window.deviceIdentity.decryptAccountKey(
-                        eak.encryptedAccountKeyForDevice
-                    );
-                    setDecryptedAccountKey(dak);
-                }
-            })();
-        }
-    }, [user]);
+                const dak = await window.deviceIdentity.decryptAccountKey(
+                    eak.encryptedAccountKeyForDevice
+                );
 
-    useEffect(() => {
-        if (encryptedPayload) {
-            (async () => {
-                try {
-                    console.log(encryptedPayload);
-                    const decryptedPayload =
-                        await window.accountEncryption.decryptPayload(
-                            encryptedPayload,
-                            decryptedAccountKey
-                        );
-                    console.log('Decrypted Payload:', decryptedPayload);
-                } catch (e) {
-                    console.error('Failed to decrypt payload:', e);
-                }
-            })();
-        }
-    }, [encryptedPayload]);
+                setDecryptedAccountKey(dak);
+
+                // Important: use `dak` directly \- don’t rely on async state update
+                await fetchAndDecryptRequests(dak);
+            } catch (e) {
+                console.error(e);
+            }
+        })();
+    }, [user, serverUrl, tokens]);
 
     return (
         <div className={'h-full w-full flex flex-col'}>
@@ -82,8 +121,8 @@ export default function Layout() {
                         placeholder={'Payload'}
                         onChange={(e) => setPayload(e.target.value)}
                     />
-                    <Button variant={'outlined'} onClick={handleEncryptPayload}>
-                        Encrypt
+                    <Button variant={'outlined'} onClick={handleSaveRequest}>
+                        Save
                     </Button>
                 </div>
             </div>
