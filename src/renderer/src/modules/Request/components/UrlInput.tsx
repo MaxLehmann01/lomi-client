@@ -1,16 +1,16 @@
-import { useState } from 'react';
 import { TextField } from '@mui/material';
+import { useRequestConfig } from '@renderer/src/modules/Request/state/RequestConfig';
 
 export default function RequestUrlInput() {
-    const [url, setUrl] = useState<string>('');
+    const { rawUrl, setRawUrl } = useRequestConfig();
 
     return (
         <TextField
             variant={'outlined'}
             size={'small'}
             placeholder={'URL'}
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            value={rawUrl}
+            onChange={(e) => setRawUrl(e.target.value)}
             fullWidth={true}
         />
     );

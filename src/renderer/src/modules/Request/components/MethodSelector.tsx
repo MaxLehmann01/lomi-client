@@ -1,9 +1,9 @@
 import { MenuItem, Select } from '@mui/material';
 import HttpMethod from '@renderer/src/enums/HttpMethod';
-import { useState } from 'react';
+import { useRequestConfig } from '@renderer/src/modules/Request/state/RequestConfig';
 
 export default function RequestMethodSelector() {
-    const [method, setMethod] = useState<HttpMethod>(HttpMethod.GET);
+    const { method, setMethod } = useRequestConfig();
 
     return (
         <Select
