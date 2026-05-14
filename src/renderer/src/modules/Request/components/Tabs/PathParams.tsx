@@ -1,4 +1,14 @@
 import TabPanel from '@renderer/src/modules/Shared/components/TabPanel';
+import { useRequestConfig } from '@renderer/src/modules/Request/state/RequestConfig';
+import { RequestPathParam } from '@renderer/src/modules/Request/Types';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    TextField,
+} from '@mui/material';
 
 export default function RequestPathParamsTab({
     tabIndex,
@@ -7,40 +17,69 @@ export default function RequestPathParamsTab({
     tabIndex: number;
     selectedTabIndex: number;
 }) {
+    const { pathParams, setPathParams } = useRequestConfig();
+
+    function handleEditQueryParam(
+        index: number,
+        value: RequestPathParam['value']
+    ) {
+        const next = [...pathParams];
+        next[index] = { ...next[index], value };
+        setPathParams(next);
+    }
+
     return (
         <TabPanel
             use={'request-configurator'}
             tabIndex={tabIndex}
             selectedTabIndex={selectedTabIndex}
         >
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-            nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
-            erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
-            et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
-            Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur
-            sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
-            et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
-            accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
-            no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum
-            dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
-            tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-            voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-            Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum
-            dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in
-            vulputate velit esse molestie consequat, vel illum dolore eu feugiat
-            nulla facilisis at vero eros et accumsan et iusto odio dignissim qui
-            blandit praesent luptatum zzril delenit augue duis dolore te feugait
-            nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing
-            elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore
-            magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis
-            nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip
-            ex ea commodo consequat. Duis autem vel eum iriure dolor in
-            hendrerit in vulputate velit esse molestie consequat, vel illum
-            dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto
-            odio dignissim qui blandit praesent luptatum zzril delenit augue
-            duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta
-            nobis eleifend option congue nihil imperdiet doming id quod mazim
-            placerat facer possim assum. Lorem
+            <Table size={'small'} className={'w-full table-fixed'}>
+                <colgroup>
+                    <col className={'w-1/2'} />
+                    <col className={'w-1/2'} />
+                </colgroup>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Key</TableCell>
+                        <TableCell>Value</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {pathParams.map((pathParam, index) => (
+                        <TableRow key={index}>
+                            <TableCell>
+                                <TextField
+                                    size={'small'}
+                                    variant={'outlined'}
+                                    fullWidth={true}
+                                    value={pathParam.key}
+                                    slotProps={{
+                                        input: {
+                                            readOnly: true,
+                                        },
+                                    }}
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <TextField
+                                    size={'small'}
+                                    variant={'outlined'}
+                                    fullWidth={true}
+                                    placeholder={'Value of the Path Parameter'}
+                                    value={pathParam.value}
+                                    onChange={(e) =>
+                                        handleEditQueryParam(
+                                            index,
+                                            e.currentTarget.value
+                                        )
+                                    }
+                                />
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
         </TabPanel>
     );
 }

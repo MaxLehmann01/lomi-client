@@ -6,8 +6,23 @@ export type RequestConfigContext = {
     setRawUrl: Dispatch<SetStateAction<string>>;
     method: HttpMethod;
     setMethod: Dispatch<SetStateAction<HttpMethod>>;
+    pathParams: RequestPathParam[];
+    setPathParams: Dispatch<SetStateAction<RequestPathParam[]>>;
+    queryParams: RequestQueryParam[];
+    setQueryParams: Dispatch<SetStateAction<RequestQueryParam[]>>;
     headers: RequestHeader[];
     setHeaders: Dispatch<SetStateAction<RequestHeader[]>>;
+};
+
+export type RequestPathParam = {
+    key: string;
+    value: string;
+};
+
+export type RequestQueryParam = {
+    isEnabled: boolean;
+    key: string;
+    value: string;
 };
 
 export type RequestHeader = {
