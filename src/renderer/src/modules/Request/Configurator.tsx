@@ -1,34 +1,26 @@
+import RequestMethodSelector from '@renderer/src/modules/Request/components/MethodSelector';
+import RequestUrlInput from '@renderer/src/modules/Request/components/UrlInput';
+import { Button, Divider } from '@mui/material';
+import { Send as SendIcon } from '@mui/icons-material';
+import RequestTabsWrapper from '@renderer/src/modules/Request/components/TabsWrapper';
+
 export default function RequestConfigurator() {
     return (
-        <div className="min-h-full flex flex-col p-2 gap-2">
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-            nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
-            erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
-            et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
-            Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur
-            sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
-            et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
-            accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
-            no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum
-            dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
-            tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-            voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-            Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum
-            dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in
-            vulputate velit esse molestie consequat, vel illum dolore eu feugiat
-            nulla facilisis at vero eros et accumsan et iusto odio dignissim qui
-            blandit praesent luptatum zzril delenit augue duis dolore te feugait
-            nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing
-            elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore
-            magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis
-            nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip
-            ex ea commodo consequat. Duis autem vel eum iriure dolor in
-            hendrerit in vulputate velit esse molestie consequat, vel illum
-            dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto
-            odio dignissim qui blandit praesent luptatum zzril delenit augue
-            duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta
-            nobis eleifend option congue nihil imperdiet doming id quod mazim
-            placerat facer possim assum. Lorem
+        <div className="h-full min-h-0 flex flex-col p-2 gap-2 overflow-hidden">
+            <div className="flex gap-2 shrink-0">
+                <RequestMethodSelector />
+                <RequestUrlInput />
+                <Button
+                    className="px-4"
+                    size="small"
+                    variant="outlined"
+                    endIcon={<SendIcon />}
+                >
+                    Send
+                </Button>
+            </div>
+            <Divider className="shrink-0" />
+            <RequestTabsWrapper />
         </div>
     );
 }

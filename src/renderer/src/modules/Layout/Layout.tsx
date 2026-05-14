@@ -1,10 +1,8 @@
-// `src/renderer/src/modules/Layout/Layout.tsx`
-
 import { Card, Divider, IconButton, Tooltip } from '@mui/material';
 import AuthButton from '@renderer/src/modules/Auth/components/AuthButton';
 import { Add as AddIcon, Menu as MenuIcon } from '@mui/icons-material';
 import { useEffect, useRef, useState } from 'react';
-import RequestDrawer from '@renderer/src/modules/Request/Drawer';
+import RequestDrawer from '@renderer/src/modules/Request/components/Drawer';
 import RequestConfigurator from '@renderer/src/modules/Request/Configurator';
 import ResponseContainer from '@renderer/src/modules/Response/Container';
 
@@ -53,9 +51,8 @@ export default function Layout() {
 
                 <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
                     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-                        {/* Scroll must be on a child inside a shrinkable flex item */}
                         <div className="flex-1 min-h-0 overflow-hidden">
-                            <div className="h-full min-h-0 overflow-auto">
+                            <div className="h-full min-h-0 overflow-hidden flex flex-col">
                                 <RequestConfigurator />
                             </div>
                         </div>
