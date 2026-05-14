@@ -1,135 +1,117 @@
-// src/renderer/src/modules/Layout/Layout.tsx
-import { Button, Divider, TextField } from '@mui/material';
+// `src/renderer/src/modules/Layout/Layout.tsx`
+
+import { Card, Divider, IconButton, Tooltip } from '@mui/material';
 import AuthButton from '@renderer/src/modules/Auth/components/AuthButton';
-import useAuth from '@renderer/src/modules/Auth/state/useAuth';
-import { apiRequest } from '@renderer/src/services/Api';
-import { useEffect, useState } from 'react';
-import { EncryptedPayload } from '@shared/Types/AccountEncryption';
+import { Add as AddIcon, Menu as MenuIcon } from '@mui/icons-material';
+import { useEffect, useRef, useState } from 'react';
+import RequestDrawer from '@renderer/src/modules/Request/Drawer';
+import RequestConfigurator from '@renderer/src/modules/Request/Configurator';
+import ResponseContainer from '@renderer/src/modules/Response/Container';
 
 export default function Layout() {
-    const { serverUrl, tokens, user } = useAuth();
+    const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
-    const [encryptedAccountKey, setEncryptedAccountKey] = useState<any>(null);
-    const [decryptedAccountKey, setDecryptedAccountKey] = useState<any>(null);
-
-    const [payload, setPayload] = useState<string>('');
-
-    const handleSaveRequest = async () => {
-        if (!serverUrl || !tokens || !user || !decryptedAccountKey) return;
-
-        try {
-            const encrypted = await window.accountEncryption.encryptPayload(
-                payload,
-                decryptedAccountKey
-            );
-
-            await apiRequest({
-                method: 'POST',
-                url: `${serverUrl}/requests`,
-                data: encrypted,
-                headers: {
-                    'x-auth-access-token': tokens.accessToken.token,
-                    'x-auth-refresh-token': tokens.refreshToken.token,
-                },
-            });
-        } catch (e) {
-            console.error(e);
-        }
-    };
-
-    const fetchAndDecryptRequests = async (accountKey: string) => {
-        if (!serverUrl || !tokens || !user) return;
-
-        const response = await apiRequest<{ data: any[] }>({
-            method: 'GET',
-            url: `${serverUrl}/requests`,
-            headers: {
-                'x-auth-access-token': tokens.accessToken.token,
-                'x-auth-refresh-token': tokens.refreshToken.token,
-            },
-        });
-
-        const decrypted = await Promise.all(
-            (response.data.data ?? []).map(async (req) => {
-                const encryptedConfig = req?.encryptedConfig as
-                    | EncryptedPayload
-                    | undefined;
-
-                if (!encryptedConfig) return null;
-
-                try {
-                    return await window.accountEncryption.decryptPayload(
-                        encryptedConfig,
-                        accountKey
-                    );
-                } catch (err) {
-                    console.error(`decrypt failed`, {
-                        err,
-                        encryptedConfig,
-                        accountKeyType: typeof accountKey,
-                        accountKeyIsNull: accountKey == null,
-                    });
-                    return null;
-                }
-            })
-        );
-
-        console.log(decrypted.filter((x) => x != null));
-    };
+    const [responseHeight, setResponseHeight] = useState<number>(260);
+    const dragStateRef = useRef<{ startY: number; startHeight: number } | null>(
+        null
+    );
 
     useEffect(() => {
-        if (!user) return;
+        function onPointerMove(e: PointerEvent) {
+            if (!dragStateRef.current) return;
 
-        (async () => {
-            try {
-                const eak =
-                    await window.accountEncryption.loadLocalEncryptedAccountKey(
-                        user.id
-                    );
+            const { startY, startHeight } = dragStateRef.current;
+            const dy = e.clientY - startY;
 
-                setEncryptedAccountKey(eak);
-                if (!eak) return;
+            const next = startHeight - dy;
 
-                const dak = await window.deviceIdentity.decryptAccountKey(
-                    eak.encryptedAccountKeyForDevice
-                );
+            const min = 120;
+            const max = Math.max(min, window.innerHeight - 200);
+            setResponseHeight(Math.min(max, Math.max(min, next)));
+        }
 
-                setDecryptedAccountKey(dak);
+        function onPointerUp() {
+            dragStateRef.current = null;
+        }
 
-                // Important: use `dak` directly \- don’t rely on async state update
-                await fetchAndDecryptRequests(dak);
-            } catch (e) {
-                console.error(e);
-            }
-        })();
-    }, [user, serverUrl, tokens]);
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+
+        return () => {
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
+        };
+    }, []);
 
     return (
-        <div className={'h-full w-full flex flex-col'}>
-            <div className={'flex-1'}>
-                <pre>{JSON.stringify(user, null, 2)}</pre>
-                <Divider />
-                <pre>{JSON.stringify(encryptedAccountKey, null, 2)}</pre>
-                <Divider />
-                <pre>{JSON.stringify(decryptedAccountKey, null, 2)}</pre>
-                <Divider />
-                <div>
-                    <TextField
-                        size={'small'}
-                        variant={'outlined'}
-                        value={payload}
-                        placeholder={'Payload'}
-                        onChange={(e) => setPayload(e.target.value)}
-                    />
-                    <Button variant={'outlined'} onClick={handleSaveRequest}>
-                        Save
-                    </Button>
+        <div className="h-full w-full flex flex-col overflow-hidden min-h-0">
+            <div className="flex-1 min-h-0 flex overflow-hidden relative">
+                <RequestDrawer
+                    isOpen={isDrawerOpen}
+                    onClose={() => setIsDrawerOpen(false)}
+                />
+
+                <div className="flex-1 min-w-0 min-h-0 flex flex-col overflow-hidden">
+                    <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+                        {/* Scroll must be on a child inside a shrinkable flex item */}
+                        <div className="flex-1 min-h-0 overflow-hidden">
+                            <div className="h-full min-h-0 overflow-auto">
+                                <RequestConfigurator />
+                            </div>
+                        </div>
+                        <Divider />
+                        <div
+                            className="shrink-0 overflow-hidden"
+                            style={{ height: responseHeight }}
+                        >
+                            <div
+                                className="h-2 cursor-row-resize select-none flex items-center justify-center"
+                                onPointerDown={(e) => {
+                                    dragStateRef.current = {
+                                        startY: e.clientY,
+                                        startHeight: responseHeight,
+                                    };
+                                    e.currentTarget.setPointerCapture(
+                                        e.pointerId
+                                    );
+                                }}
+                            >
+                                <div className="h-0.5 w-16 bg-white/20 rounded" />
+                            </div>
+
+                            <div className="h-[calc(100%-0.5rem)] min-h-0 overflow-auto">
+                                <ResponseContainer />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
             <Divider />
-            <div className={'w-full p-2'}>
-                <AuthButton />
-            </div>
+
+            <Card className="w-full flex items-center justify-between p-2 shrink-0">
+                <div className="flex gap-2 items-center">
+                    <Tooltip title={isDrawerOpen ? 'Close Menu' : 'Open Menu'}>
+                        <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => setIsDrawerOpen((prev) => !prev)}
+                        >
+                            <MenuIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="New Request">
+                        <IconButton size="small" color="primary">
+                            <AddIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </div>
+
+                <div className="flex gap-2 items-center">
+                    <AuthButton />
+                </div>
+            </Card>
         </div>
     );
 }
