@@ -8,6 +8,7 @@ import {
     useState,
 } from 'react';
 import {
+    RequestAuthorization,
     RequestConfigContext,
     RequestCookie,
     RequestHeader,
@@ -42,6 +43,10 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
             rawUrl: '',
             pathParams: [],
             queryParams: [],
+            authorization: {
+                type: '',
+                value: null,
+            } as RequestAuthorization,
             cookies: [],
             headers: [],
         }),
@@ -56,6 +61,9 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
     );
     const [queryParams, setQueryParams] = useState<RequestQueryParam[]>(
         fallback.queryParams
+    );
+    const [authorization, setAuthorization] = useState<RequestAuthorization>(
+        fallback.authorization
     );
     const [cookies, setCookies] = useState<RequestCookie[]>(fallback.cookies);
     const [headers, setHeaders] = useState<RequestHeader[]>(fallback.headers);
@@ -118,6 +126,8 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
             setPathParams,
             queryParams,
             setQueryParams,
+            authorization,
+            setAuthorization,
             cookies,
             setCookies,
             headers,
@@ -132,6 +142,8 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
             setPathParams,
             queryParams,
             setQueryParams,
+            authorization,
+            setAuthorization,
             cookies,
             setCookies,
             headers,

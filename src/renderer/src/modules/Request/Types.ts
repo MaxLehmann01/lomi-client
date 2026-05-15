@@ -10,6 +10,8 @@ export type RequestConfigContext = {
     setPathParams: Dispatch<SetStateAction<RequestPathParam[]>>;
     queryParams: RequestQueryParam[];
     setQueryParams: Dispatch<SetStateAction<RequestQueryParam[]>>;
+    authorization: RequestAuthorization;
+    setAuthorization: Dispatch<SetStateAction<RequestAuthorization>>;
     cookies: RequestCookie[];
     setCookies: Dispatch<SetStateAction<RequestCookie[]>>;
     headers: RequestHeader[];
@@ -26,6 +28,15 @@ export type RequestQueryParam = {
     key: string;
     value: string;
 };
+
+export type RequestAuthorizationBasicValue = {
+    username: string;
+    password: string;
+};
+
+export type RequestAuthorization =
+    | { type: ''; value: null }
+    | { type: 'Basic'; value: RequestAuthorizationBasicValue };
 
 export type RequestCookie = {
     isEnabled: boolean;
