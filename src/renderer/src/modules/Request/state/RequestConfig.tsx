@@ -9,6 +9,7 @@ import {
 } from 'react';
 import {
     RequestConfigContext,
+    RequestCookie,
     RequestHeader,
     RequestPathParam,
     RequestQueryParam,
@@ -41,6 +42,7 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
             rawUrl: '',
             pathParams: [],
             queryParams: [],
+            cookies: [],
             headers: [],
         }),
         []
@@ -55,6 +57,7 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
     const [queryParams, setQueryParams] = useState<RequestQueryParam[]>(
         fallback.queryParams
     );
+    const [cookies, setCookies] = useState<RequestCookie[]>(fallback.cookies);
     const [headers, setHeaders] = useState<RequestHeader[]>(fallback.headers);
 
     const lastUrlSyncSourceRef = useRef<'input' | 'state' | null>(null);
@@ -115,6 +118,8 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
             setPathParams,
             queryParams,
             setQueryParams,
+            cookies,
+            setCookies,
             headers,
             setHeaders,
         }),
@@ -127,6 +132,8 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
             setPathParams,
             queryParams,
             setQueryParams,
+            cookies,
+            setCookies,
             headers,
             setHeaders,
         ]
