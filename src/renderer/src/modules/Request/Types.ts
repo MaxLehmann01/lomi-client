@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import HttpMethod from '@renderer/src/enums/HttpMethod';
+import { IpcAxiosRequestConfig } from '@shared/Types/Api';
 
 export type RequestConfigContext = {
     rawUrl: string;
@@ -16,6 +17,9 @@ export type RequestConfigContext = {
     setCookies: Dispatch<SetStateAction<RequestCookie[]>>;
     headers: RequestHeader[];
     setHeaders: Dispatch<SetStateAction<RequestHeader[]>>;
+    body: RequestBody;
+    setBody: Dispatch<SetStateAction<RequestBody>>;
+    requestConfig: IpcAxiosRequestConfig;
 };
 
 export type RequestPathParam = {
@@ -49,3 +53,12 @@ export type RequestHeader = {
     key: string;
     value: string;
 };
+
+export type RequestBody =
+    | {
+          type: '';
+      }
+    | {
+          type: 'text';
+          content: string;
+      };

@@ -9,6 +9,7 @@ import {
 } from 'react';
 import {
     RequestAuthorization,
+    RequestBody,
     RequestConfigContext,
     RequestCookie,
     RequestHeader,
@@ -20,9 +21,11 @@ import {
     arePathParamsEqual,
     areQueryParamsEqual,
     buildRawUrlFromBaseAndQueryParameters,
+    buildRequestConfig,
     parseQueryParamsFromRawUrl,
     syncPathParamsWithBaseUrl,
 } from '@renderer/src/modules/Request/Utils';
+import { IpcAxiosRequestConfig } from '@shared/Types/Api';
 
 export function useRequestConfig() {
     const context = useContext(Context);
@@ -41,14 +44,15 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
         () => ({
             method: HttpMethod.GET,
             rawUrl: '',
-            pathParams: [],
-            queryParams: [],
+            pathParams: [] as RequestPathParam[],
+            queryParams: [] as RequestQueryParam[],
             authorization: {
                 type: '',
                 value: null,
             } as RequestAuthorization,
-            cookies: [],
-            headers: [],
+            cookies: [] as RequestCookie[],
+            headers: [] as RequestHeader[],
+            body: { type: '' } as RequestBody,
         }),
         []
     );
@@ -67,6 +71,7 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
     );
     const [cookies, setCookies] = useState<RequestCookie[]>(fallback.cookies);
     const [headers, setHeaders] = useState<RequestHeader[]>(fallback.headers);
+    const [body, setBody] = useState<RequestBody>(fallback.body);
 
     const lastUrlSyncSourceRef = useRef<'input' | 'state' | null>(null);
 
@@ -114,6 +119,28 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
         });
     }, [baseUrl]);
 
+    const requestConfig = useMemo<IpcAxiosRequestConfig>(() => {
+        return buildRequestConfig(
+            method,
+            baseUrl,
+            pathParams,
+            queryParams,
+            authorization,
+            cookies,
+            headers,
+            body
+        );
+    }, [
+        method,
+        baseUrl,
+        pathParams,
+        queryParams,
+        authorization,
+        cookies,
+        headers,
+        body,
+    ]);
+
     const contextValue = useMemo(
         () => ({
             rawUrl,
@@ -132,6 +159,9 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
             setCookies,
             headers,
             setHeaders,
+            body,
+            setBody,
+            requestConfig,
         }),
         [
             rawUrl,
@@ -148,6 +178,9 @@ export function RequestConfigProvider({ children }: { children: ReactNode }) {
             setCookies,
             headers,
             setHeaders,
+            body,
+            setBody,
+            requestConfig,
         ]
     );
 

@@ -1,7 +1,13 @@
 import {
+    RequestAuthorization,
+    RequestBody,
+    RequestCookie,
+    RequestHeader,
     RequestPathParam,
     RequestQueryParam,
 } from '@renderer/src/modules/Request/Types';
+import { IpcAxiosRequestConfig } from '@shared/Types/Api';
+import HttpMethod from '@renderer/src/enums/HttpMethod';
 
 function escapeAmpersand(raw: string): string {
     return raw.replaceAll('&', '%26');
@@ -39,6 +45,43 @@ function extractPlaceholdersFromBaseUrl(baseUrl: string): string[] {
     }
 
     return keys;
+}
+
+function applyPathParameters(
+    baseUrl: string,
+    pathParameters: RequestPathParam[]
+): string {
+    const valuesByKey = new Map(
+        pathParameters
+            .filter((p) => p.key.trim() !== '')
+            .map((p) => [p.key, p.value] as const)
+    );
+
+    return baseUrl.replaceAll(/\{([^{}]+)}/g, (full, keyRaw) => {
+        const key = String(keyRaw).trim();
+        if (!key) {
+            return full;
+        }
+
+        const value = valuesByKey.get(key);
+
+        if (value === undefined) {
+            return full;
+        }
+
+        return value;
+    });
+}
+
+function toBase64(value: string): string {
+    const bytes = new TextEncoder().encode(value);
+    let binary = '';
+
+    for (const b of bytes) {
+        binary += String.fromCharCode(b);
+    }
+
+    return globalThis.btoa(binary);
 }
 
 export function buildRawUrlFromBaseAndQueryParameters(
@@ -165,4 +208,63 @@ export function arePathParamsEqual(
     }
 
     return true;
+}
+
+export function buildRequestConfig(
+    method: HttpMethod,
+    baseUrl: string,
+    pathParams: RequestPathParam[],
+    queryParams: RequestQueryParam[],
+    authorization: RequestAuthorization,
+    cookies: RequestCookie[],
+    headers: RequestHeader[],
+    body: RequestBody
+): IpcAxiosRequestConfig {
+    const baseWithPathApplied = applyPathParameters(baseUrl, pathParams);
+
+    const url = buildRawUrlFromBaseAndQueryParameters(
+        baseWithPathApplied,
+        queryParams
+    );
+
+    const headerRecord = headers
+        .filter((header) => header.isEnabled)
+        .filter((header) => header.key.trim() !== '')
+        .reduce(
+            (acc, header) => {
+                acc[header.key] = header.value;
+                return acc;
+            },
+            {} as Record<string, string>
+        );
+
+    if (authorization.type === 'Basic') {
+        const username = authorization.value.username;
+        const password = authorization.value.password;
+
+        if (username.length > 0 || password.length > 0) {
+            headerRecord['Authorization'] =
+                `Basic ${toBase64(`${username}:${password}`)}`;
+        }
+    }
+
+    const cookiePairs = cookies
+        .filter((cookie) => cookie.isEnabled)
+        .filter((cookie) => cookie.key.trim() !== '')
+        .map((c) => {
+            const key = c.key.trim();
+            const value = c.value ?? '';
+            return `${key}=${value}`;
+        });
+
+    if (cookiePairs.length > 0) {
+        headerRecord['Cookie'] = cookiePairs.join('; ');
+    }
+
+    return {
+        method,
+        url,
+        headers: headerRecord,
+        data: body.type === '' ? undefined : body.content,
+    };
 }
